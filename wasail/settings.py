@@ -45,15 +45,20 @@ TEMPLATES = [{
 
 WSGI_APPLICATION = 'wasail.wsgi.application'
 
-DATABASE_URL = config('DATABASE_URL', default='')
-if DATABASE_URL:
+# --- تعديل إعدادات قاعدة البيانات ---
+db_url_value = config('DATABASE_URL', default=None)
+
+if db_url_value:
     import dj_database_url
-    DATABASES = {'default': dj_database_url.parse(DATABASE_URL)}
+    DATABASES = {'default': dj_database_url.parse(db_url_value)}
 else:
-    DATABASES = {'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }}
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
+# ------------------------------------
 
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
