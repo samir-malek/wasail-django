@@ -46,13 +46,14 @@ TEMPLATES = [{
 
 WSGI_APPLICATION = 'wasail.wsgi.application'
 
-# --- إعدادات قاعدة البيانات (طريقة مباشرة بدون مكتبات خارجية معقدة) ---
-DATABASE_URL = os.environ.get('DATABASE_URL', '')
+# --- إعدادات قاعدة البيانات (تم التصحيح) ---
+# نستخدم default=None لضمان عدم الحصول على سلسلة فارغة
+db_url = os.environ.get('DATABASE_URL') or config('DATABASE_URL', default=None)
 
-if DATABASE_URL:
+if db_url:
     # إذا وجد المتغير، نستخدم dj_database_url لتحليله
     import dj_database_url
-    DATABASES = {'default': dj_database_url.parse(DATABASE_URL)}
+    DATABASES = {'default': dj_database_url.parse(db_url)}
 else:
     # إذا لم يوجدم نستخدم SQLite
     DATABASES = {
