@@ -45,20 +45,23 @@ TEMPLATES = [{
 
 WSGI_APPLICATION = 'wasail.wsgi.application'
 
-# --- تعديل إعدادات قاعدة البيانات ---
-db_url_value = config('DATABASE_URL', default=None)
+# --- تعديل إعدادات قاعدة البيانات (الحل النهائي) ---
+# نقرأ المتغير، ونتحقق مما إذا كان موجوداً وغير فارغ
+db_url_value = config('DATABASE_URL', default='')
 
-if db_url_value:
+# الشرط يتحقق الآن أن القيمة ليست فارغة أيضاً
+if db_url_value and db_url_value.strip():
     import dj_database_url
     DATABASES = {'default': dj_database_url.parse(db_url_value)}
 else:
+    # استخدام SQLite كحل بديل آمن
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
-# ------------------------------------
+# ---------------------------------------------------
 
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
