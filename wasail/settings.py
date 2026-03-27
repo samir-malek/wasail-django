@@ -1,5 +1,6 @@
 from pathlib import Path
 from decouple import config
+import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-wasail-faculty-bba-2024-change-in-production')
@@ -45,23 +46,22 @@ TEMPLATES = [{
 
 WSGI_APPLICATION = 'wasail.wsgi.application'
 
-# --- تعديل إعدادات قاعدة البيانات (الحل النهائي) ---
-# نقرأ المتغير، ونتحقق مما إذا كان موجوداً وغير فارغ
-db_url_value = config('DATABASE_URL', default='')
+# --- إعدادات قاعدة البيانات (طريقة مباشرة بدون مكتبات خارجية معقدة) ---
+DATABASE_URL = os.environ.get('DATABASE_URL', '')
 
-# الشرط يتحقق الآن أن القيمة ليست فارغة أيضاً
-if db_url_value and db_url_value.strip():
+if DATABASE_URL:
+    # إذا وجد المتغير، نستخدم dj_database_url لتحليله
     import dj_database_url
-    DATABASES = {'default': dj_database_url.parse(db_url_value)}
+    DATABASES = {'default': dj_database_url.parse(DATABASE_URL)}
 else:
-    # استخدام SQLite كحل بديل آمن
+    # إذا لم يوجدم نستخدم SQLite
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
-# ---------------------------------------------------
+# --------------------------------------------------------------------
 
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
