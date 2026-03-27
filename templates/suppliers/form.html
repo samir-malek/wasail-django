@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}{% if action == "add" %}إضافة مورد{% else %}تعديل مورد{% endif %}{% endblock %}
+{% block content %}
+<div class="page-header">
+  <span class="ph-icon">🏭</span>
+  <div><h1>{% if action == "add" %}تسجيل مورد جديد{% else %}تعديل: {{ s.name }}{% endif %}</h1></div>
+</div>
+<div class="card"><div class="card-body p-4">
+  <form method="post">{% csrf_token %}
+    <h6 class="fw-bold mb-3 text-primary border-bottom pb-2">📋 المعلومات الأساسية</h6>
+    <div class="row g-3 mb-4">
+      <div class="col-md-3"><label class="form-label">الرمز ★</label><input type="text" name="code" class="form-control" value="{{ s.code|default:'' }}" {% if action=="edit" %}readonly{% endif %} required placeholder="SUP-001"></div>
+      <div class="col-md-5"><label class="form-label">الاسم (عربي) ★</label><input type="text" name="name" class="form-control" value="{{ s.name|default:'' }}" required></div>
+      <div class="col-md-4"><label class="form-label">Raison Sociale (FR)</label><input type="text" name="name_fr" class="form-control" value="{{ s.name_fr|default:'' }}"></div>
+      <div class="col-md-3"><label class="form-label">النوع</label>
+        <select name="supplier_type" class="form-select">
+          <option value="public" {% if s.supplier_type == "public" %}selected{% endif %}>مؤسسة عمومية</option>
+          <option value="private" {% if s.supplier_type == "private" or not s.supplier_type %}selected{% endif %}>شركة خاصة</option>
+          <option value="sme" {% if s.supplier_type == "sme" %}selected{% endif %}>مؤسسة صغيرة</option>
+          <option value="retail" {% if s.supplier_type == "retail" %}selected{% endif %}>تاجر تجزئة</option>
+          <option value="importer" {% if s.supplier_type == "importer" %}selected{% endif %}>مستورد</option>
+        </select>
+      </div>
+      <div class="col-md-3"><label class="form-label">الهاتف ★</label><input type="text" name="phone" class="form-control" value="{{ s.phone|default:'' }}" required></div>
+      <div class="col-md-3"><label class="form-label">هاتف 2</label><input type="text" name="phone2" class="form-control" value="{{ s.phone2|default:'' }}"></div>
+      <div class="col-md-3"><label class="form-label">البريد الإلكتروني</label><input type="email" name="email" class="form-control" value="{{ s.email|default:'' }}"></div>
+      <div class="col-md-6"><label class="form-label">الولاية</label>
+        <select name="wilaya" class="form-select">
+          <option value="">-- اختر --</option>
+          {% for w in wilayas %}<option value="{{ w }}" {% if s.wilaya == w %}selected{% endif %}>{{ w }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="col-md-6"><label class="form-label">العنوان</label><input type="text" name="address" class="form-control" value="{{ s.address|default:'' }}"></div>
+    </div>
+    <h6 class="fw-bold mb-3 text-primary border-bottom pb-2">📊 المعلومات القانونية</h6>
+    <div class="row g-3 mb-4">
+      <div class="col-md-4"><label class="form-label">NIF</label><input type="text" name="nif" class="form-control" value="{{ s.nif|default:'' }}"></div>
+      <div class="col-md-4"><label class="form-label">NIS</label><input type="text" name="nis" class="form-control" value="{{ s.nis|default:'' }}"></div>
+      <div class="col-md-4"><label class="form-label">RC</label><input type="text" name="rc" class="form-control" value="{{ s.rc|default:'' }}"></div>
+      <div class="col-md-6"><label class="form-label">البنك</label><input type="text" name="bank_name" class="form-control" value="{{ s.bank_name|default:'' }}"></div>
+      <div class="col-md-6"><label class="form-label">رقم الحساب</label><input type="text" name="bank_account" class="form-control" value="{{ s.bank_account|default:'' }}"></div>
+      <div class="col-md-4"><label class="form-label">شروط الدفع</label>
+        <select name="payment_terms" class="form-select">
+          <option value="cash" {% if s.payment_terms == "cash" or not s.payment_terms %}selected{% endif %}>نقداً</option>
+          <option value="30" {% if s.payment_terms == "30" %}selected{% endif %}>30 يوم</option>
+          <option value="60" {% if s.payment_terms == "60" %}selected{% endif %}>60 يوم</option>
+          <option value="90" {% if s.payment_terms == "90" %}selected{% endif %}>90 يوم</option>
+        </select>
+      </div>
+      <div class="col-md-4"><label class="form-label">مدة التسليم (أيام)</label><input type="number" name="delivery_days" class="form-control" value="{{ s.delivery_days|default:'7' }}"></div>
+      <div class="col-md-4"><label class="form-label">التقييم</label>
+        <select name="rating" class="form-select">
+          <option value="1" {% if s.rating == 1 %}selected{% endif %}>⭐ ضعيف</option>
+          <option value="2" {% if s.rating == 2 %}selected{% endif %}>⭐⭐ مقبول</option>
+          <option value="3" {% if s.rating == 3 or not s.rating %}selected{% endif %}>⭐⭐⭐ جيد</option>
+          <option value="4" {% if s.rating == 4 %}selected{% endif %}>⭐⭐⭐⭐ جيد جداً</option>
+          <option value="5" {% if s.rating == 5 %}selected{% endif %}>⭐⭐⭐⭐⭐ ممتاز</option>
+        </select>
+      </div>
+      <div class="col-12"><label class="form-label">ملاحظات</label><textarea name="notes" class="form-control" rows="2">{{ s.notes|default:'' }}</textarea></div>
+      {% if action == "edit" %}<div class="col-12"><div class="form-check form-switch"><input class="form-check-input" type="checkbox" name="active" {% if s.active %}checked{% endif %}><label class="form-check-label">مورد نشط</label></div></div>{% endif %}
+    </div>
+    <div class="d-flex gap-2"><button type="submit" class="btn btn-primary px-4"><i class="bi bi-check-lg"></i> حفظ</button><a href="{% url 'suppliers:list' %}" class="btn btn-outline-secondary">إلغاء</a></div>
+  </form>
+</div></div>
+{% endblock %}

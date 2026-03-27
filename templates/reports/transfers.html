@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}تقرير السندات{% endblock %}
+{% block content %}
+<div class="page-header"><span class="ph-icon">📋</span><div><h1>تقرير سندات التحويل</h1></div>
+  <div class="ph-actions"><a href="{% url 'reports:index' %}" class="btn btn-outline-secondary"><i class="bi bi-arrow-right"></i> التقارير</a></div>
+</div>
+<div class="row g-3 mb-3">
+{% for stat in by_status %}
+<div class="col-md-2"><div class="card text-center p-3"><div style="font-size:1.5rem;font-weight:900">{{ stat.c }}</div><small class="text-muted">{{ stat.status }}</small></div></div>
+{% endfor %}
+</div>
+<div class="row g-3">
+  <div class="col-md-6"><div class="card"><div class="card-header">الطلبات حسب المصلحة</div>
+    <div class="card-body p-0"><table class="table table-custom mb-0">
+      <thead><tr><th>المصلحة</th><th>عدد الطلبات</th></tr></thead>
+      <tbody>{% for d in by_dept %}<tr><td>{{ d.requesting_dept }}</td><td><span class="badge bg-primary">{{ d.c }}</span></td></tr>{% endfor %}</tbody>
+    </table></div></div></div>
+  <div class="col-md-6"><div class="card"><div class="card-header">آخر السندات</div>
+    <div class="card-body p-0"><table class="table table-custom mb-0">
+      <thead><tr><th>السند</th><th>المصلحة</th><th>الحالة</th></tr></thead>
+      <tbody>{% for t in qs|slice:":10" %}<tr>
+        <td><a href="{% url 'transfers:detail' t.pk %}">{{ t.number }}</a></td>
+        <td>{{ t.requesting_dept }}</td>
+        <td><span class="badge bg-{{ t.status_badge }}">{{ t.get_status_display }}</span></td>
+      </tr>{% endfor %}</tbody>
+    </table></div></div></div>
+</div>
+{% endblock %}

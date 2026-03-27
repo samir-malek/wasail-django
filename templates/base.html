@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}{{ APP_NAME }}{% endblock %} | {{ FACULTY_NAME }}</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #1a1a2e;
+  --primary-light: #16213e;
+  --accent: #e94560;
+  --accent2: #0f3460;
+  --sidebar-w: 260px;
+}
+* { font-family: 'Tajawal', Tahoma, sans-serif !important; }
+body { background: #f0f2f5; min-height: 100vh; }
+
+/* ── شريط علوي ── */
+.topbar {
+  height: 58px;
+  background: linear-gradient(135deg, var(--primary), var(--accent2));
+  box-shadow: 0 2px 12px rgba(0,0,0,.25);
+  position: fixed; top: 0; right: 0; left: 0; z-index: 1030;
+  display: flex; align-items: center; padding: 0 20px; gap: 16px;
+}
+.topbar .brand { color: white; font-size: 1rem; font-weight: 800; }
+.topbar .brand small { font-size: .7rem; opacity: .65; display: block; font-weight: 400; }
+.topbar .topbar-actions { margin-right: auto; display: flex; align-items: center; gap: 12px; }
+.topbar .user-badge {
+  background: rgba(255,255,255,.12); color: white;
+  padding: 5px 14px; border-radius: 20px; font-size: .82rem;
+}
+
+/* ── شريط جانبي ── */
+.sidebar {
+  width: var(--sidebar-w);
+  background: linear-gradient(180deg, var(--primary) 0%, #111827 100%);
+  position: fixed; top: 58px; right: 0; bottom: 0;
+  overflow-y: auto; z-index: 1020;
+  padding-bottom: 20px;
+}
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 4px; }
+
+.nav-section {
+  font-size: .65rem; color: rgba(255,255,255,.35);
+  padding: 16px 18px 4px; text-transform: uppercase; letter-spacing: 1.5px;
+}
+.sidebar .nav-link {
+  color: rgba(255,255,255,.65) !important;
+  padding: 9px 18px; border-radius: 8px; margin: 1px 8px;
+  font-size: .88rem; display: flex; align-items: center; gap: 10px;
+  transition: all .15s;
+}
+.sidebar .nav-link:hover {
+  background: rgba(233,69,96,.15); color: white !important;
+}
+.sidebar .nav-link.active {
+  background: rgba(233,69,96,.2);
+  color: white !important; font-weight: 700;
+  border-right: 3px solid var(--accent);
+}
+.sidebar .nav-link i { font-size: 1rem; width: 20px; text-align: center; }
+
+/* ── المحتوى ── */
+.main-content {
+  margin-right: var(--sidebar-w);
+  margin-top: 58px;
+  padding: 24px;
+  min-height: calc(100vh - 58px);
+}
+
+/* ── رأس الصفحة ── */
+.page-header {
+  background: white; border-radius: 12px;
+  padding: 18px 24px; margin-bottom: 22px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.06);
+  display: flex; align-items: center; gap: 14px;
+  border-right: 4px solid var(--accent);
+}
+.page-header .ph-icon { font-size: 1.8rem; }
+.page-header h1 { margin: 0; font-size: 1.3rem; font-weight: 800; color: var(--primary); }
+.page-header p  { margin: 2px 0 0; font-size: .8rem; color: #888; }
+.page-header .ph-actions { margin-right: auto; }
+
+/* ── البطاقات ── */
+.card { border: none; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,.07); }
+.card-header {
+  background: white; border-bottom: 1px solid #f0f0f0;
+  padding: 14px 20px; border-radius: 12px 12px 0 0 !important;
+  font-weight: 700; font-size: .92rem; color: var(--primary);
+  display: flex; align-items: center; gap: 8px;
+}
+.card-header .card-actions { margin-right: auto; }
+
+/* ── بطاقات الإحصاء ── */
+.stat-card {
+  border-radius: 12px; padding: 20px;
+  color: white; position: relative; overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0,0,0,.12);
+}
+.stat-card .stat-val { font-size: 2.2rem; font-weight: 900; line-height: 1; }
+.stat-card .stat-lbl { font-size: .82rem; opacity: .85; margin-top: 4px; }
+.stat-card .stat-icon {
+  position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+  font-size: 3rem; opacity: .15;
+}
+
+/* ── الجداول ── */
+.table-custom { font-size: .88rem; }
+.table-custom thead th {
+  background: var(--primary); color: white;
+  font-weight: 600; padding: 10px 14px;
+  border: none; white-space: nowrap;
+}
+.table-custom tbody tr { transition: background .1s; }
+.table-custom tbody tr:hover { background: #f8f9ff; }
+.table-custom tbody td { padding: 10px 14px; vertical-align: middle; border-color: #f0f0f0; }
+
+/* ── الشارات ── */
+.badge-status {
+  padding: 4px 12px; border-radius: 20px;
+  font-size: .75rem; font-weight: 600;
+}
+
+/* ── النماذج ── */
+.form-label { font-weight: 600; font-size: .88rem; color: #444; }
+.form-control, .form-select {
+  border-radius: 8px; border-color: #e0e0e0;
+  font-size: .88rem; padding: 8px 12px;
+}
+.form-control:focus, .form-select:focus {
+  border-color: var(--accent); box-shadow: 0 0 0 3px rgba(233,69,96,.1);
+}
+
+/* ── الأزرار ── */
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary), var(--accent2)) !important;
+  border: none !important; border-radius: 8px !important;
+  font-weight: 600 !important;
+}
+.btn-danger { border-radius: 8px !important; font-weight: 600 !important; }
+.btn-success { border-radius: 8px !important; font-weight: 600 !important; }
+.btn-outline-secondary { border-radius: 8px !important; }
+
+/* ── تنبيهات ── */
+.alert { border-radius: 10px; border: none; }
+.alert-success { background: #d1fae5; color: #065f46; }
+.alert-danger  { background: #fee2e2; color: #991b1b; }
+.alert-warning { background: #fef3c7; color: #92400e; }
+
+/* ── طباعة ── */
+@media print {
+  .sidebar, .topbar, .no-print { display: none !important; }
+  .main-content { margin: 0 !important; padding: 0 !important; }
+}
+@media (max-width: 768px) {
+  .sidebar { display: none; }
+  .main-content { margin-right: 0; }
+}
+</style>
+{% block extra_css %}{% endblock %}
+</head>
+<body>
+
+{% if user.is_authenticated %}
+<!-- شريط علوي -->
+<div class="topbar">
+  <div class="brand">
+    <span>🏛️ {{ APP_NAME }}</span>
+    <small>{{ FACULTY_NAME }}</small>
+  </div>
+  <div class="topbar-actions">
+    {% if messages %}
+      {% for msg in messages %}
+      <span class="badge bg-{{ msg.tags|default:'secondary' }}">{{ msg }}</span>
+      {% endfor %}
+    {% endif %}
+    <span class="user-badge">
+      <i class="bi bi-person-fill"></i>
+      {{ user.get_full_name|default:user.username }}
+      <small class="opacity-75">— {{ user.profile.get_role_display }}</small>
+    </span>
+    <a href="{% url 'logout' %}" class="btn btn-sm btn-outline-light">
+      <i class="bi bi-box-arrow-left"></i> خروج
+    </a>
+  </div>
+</div>
+
+<!-- شريط جانبي -->
+<nav class="sidebar">
+  <div class="nav-section">رئيسي</div>
+  <a href="{% url 'dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+    <i class="bi bi-speedometer2"></i> لوحة التحكم
+  </a>
+
+  <div class="nav-section">المخزون</div>
+  <a href="{% url 'catalog:products' %}" class="nav-link {% if 'catalog' in request.path %}active{% endif %}">
+    <i class="bi bi-box-seam"></i> كتالوج المواد
+  </a>
+  <a href="{% url 'stock:movements' %}" class="nav-link {% if 'stock' in request.path %}active{% endif %}">
+    <i class="bi bi-arrow-left-right"></i> المخزون والحركات
+  </a>
+  <a href="{% url 'purchasing:receive' %}" class="nav-link {% if 'purchasing' in request.path %}active{% endif %}">
+    <i class="bi bi-truck"></i> الاستلام والشراء
+  </a>
+
+  <div class="nav-section">التحويل</div>
+  <a href="{% url 'transfers:list' %}" class="nav-link {% if 'transfers' in request.path %}active{% endif %}">
+    <i class="bi bi-file-earmark-text"></i> سندات التحويل
+  </a>
+  <a href="{% url 'inventory:list' %}" class="nav-link {% if 'inventory' in request.path %}active{% endif %}">
+    <i class="bi bi-clipboard-check"></i> الجرد الدوري
+  </a>
+
+  <div class="nav-section">الإدارة</div>
+  <a href="{% url 'suppliers:list' %}" class="nav-link {% if 'suppliers' in request.path %}active{% endif %}">
+    <i class="bi bi-building"></i> الموردون
+  </a>
+  <a href="{% url 'offices:list' %}" class="nav-link {% if 'offices' in request.path %}active{% endif %}">
+    <i class="bi bi-door-open"></i> المكاتب والمسؤولون
+  </a>
+
+  <div class="nav-section">التحليل</div>
+  <a href="{% url 'reports:index' %}" class="nav-link {% if 'reports' in request.path %}active{% endif %}">
+    <i class="bi bi-bar-chart-line"></i> التقارير
+  </a>
+
+  {% if user.profile.role == 'admin' or user.profile.role == 'wasail' %}
+  <div class="nav-section">النظام</div>
+  <a href="/admin/" class="nav-link">
+    <i class="bi bi-gear"></i> إعدادات النظام
+  </a>
+  {% endif %}
+</nav>
+
+<!-- المحتوى -->
+<main class="main-content">
+  {% if messages %}
+  {% for msg in messages %}
+  <div class="alert alert-{{ msg.tags|default:'info' }} alert-dismissible fade show" role="alert">
+    {{ msg }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  </div>
+  {% endfor %}
+  {% endif %}
+
+  {% block content %}{% endblock %}
+</main>
+
+{% else %}
+{% block auth_content %}{% endblock %}
+{% endif %}
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

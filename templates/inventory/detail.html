@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}{{ session.number }}{% endblock %}
+{% block content %}
+<div class="page-header"><span class="ph-icon">🗂️</span>
+  <div><h1>{{ session.number }}</h1><p>{{ session.date|date:"Y-m-d H:i" }} | {{ session.conducted_by.get_full_name }}</p></div>
+</div>
+<div class="row g-3 mb-3">
+  <div class="col-6 col-md-3"><div class="card text-center p-3" style="border-top:3px solid #6b7280"><div style="font-size:1.8rem;font-weight:900">{{ summary.total }}</div><small class="text-muted">إجمالي المنتجات</small></div></div>
+  <div class="col-6 col-md-3"><div class="card text-center p-3" style="border-top:3px solid #10b981"><div style="font-size:1.8rem;font-weight:900;color:#10b981">{{ summary.ok }}</div><small class="text-muted">✅ مطابق</small></div></div>
+  <div class="col-6 col-md-3"><div class="card text-center p-3" style="border-top:3px solid #ef4444"><div style="font-size:1.8rem;font-weight:900;color:#ef4444">{{ summary.shortage }}</div><small class="text-muted">🔴 عجز</small></div></div>
+  <div class="col-6 col-md-3"><div class="card text-center p-3" style="border-top:3px solid #f59e0b"><div style="font-size:1.8rem;font-weight:900;color:#f59e0b">{{ summary.surplus }}</div><small class="text-muted">🟡 فائض</small></div></div>
+</div>
+<div class="card"><div class="card-body p-0">
+  <table class="table table-custom mb-0">
+    <thead><tr><th>المنتج</th><th>الوحدة</th><th>النظري</th><th>الفعلي</th><th>الفرق</th></tr></thead>
+    <tbody>{% for item in items %}<tr>
+      <td>{{ item.product.name }}</td>
+      <td>{{ item.product.unit.symbol }}</td>
+      <td>{{ item.theoretical_qty }}</td>
+      <td>{{ item.actual_qty }}</td>
+      <td><strong class="{% if item.difference == 0 %}text-muted{% elif item.difference > 0 %}text-success{% else %}text-danger{% endif %}">
+        {% if item.difference >= 0 %}+{% endif %}{{ item.difference }}
+      </strong></td>
+    </tr>{% endfor %}</tbody>
+  </table>
+</div></div>
+{% endblock %}

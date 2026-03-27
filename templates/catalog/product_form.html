@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}{% if action == "add" %}إضافة منتج{% else %}تعديل منتج{% endif %}{% endblock %}
+{% block content %}
+<div class="page-header">
+  <span class="ph-icon">{% if action == "add" %}➕{% else %}✏️{% endif %}</span>
+  <div><h1>{% if action == "add" %}إضافة منتج جديد{% else %}تعديل: {{ p.name }}{% endif %}</h1></div>
+</div>
+<div class="card" style="max-width:860px">
+  <div class="card-body p-4">
+    <form method="post">{% csrf_token %}
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label class="form-label">الرمز / Code ★</label>
+          <input type="text" name="code" class="form-control" value="{{ p.code|default:'' }}" {% if action == "edit" %}readonly{% endif %} required placeholder="PAPER-A4-80G">
+        </div>
+        <div class="col-md-8">
+          <label class="form-label">اسم المنتج (عربي) ★</label>
+          <input type="text" name="name" class="form-control" value="{{ p.name|default:'' }}" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Désignation (Français)</label>
+          <input type="text" name="name_fr" class="form-control" value="{{ p.name_fr|default:'' }}">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">الفئة ★</label>
+          <select name="category" class="form-select" required>
+            <option value="">-- اختر --</option>
+            {% for c in cats %}<option value="{{ c.pk }}" {% if p.category_id == c.pk %}selected{% endif %}>{{ c.icon }} {{ c.name }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">وحدة القياس ★</label>
+          <select name="unit" class="form-select" required>
+            <option value="">-- اختر --</option>
+            {% for u in units %}<option value="{{ u.pk }}" {% if p.unit_id == u.pk %}selected{% endif %}>{{ u.name }} ({{ u.symbol }})</option>{% endfor %}
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">حد التنبيه الأدنى ★</label>
+          <input type="number" name="min_stock" class="form-control" value="{{ p.min_stock|default:'5' }}" min="0" step="0.01">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">الحد الأقصى</label>
+          <input type="number" name="max_stock" class="form-control" value="{{ p.max_stock|default:'100' }}" min="0" step="0.01">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">كمية إعادة الطلب</label>
+          <input type="number" name="reorder_qty" class="form-control" value="{{ p.reorder_qty|default:'20' }}" min="0" step="0.01">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">الماركة / Marque</label>
+          <input type="text" name="brand" class="form-control" value="{{ p.brand|default:'' }}">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">الموديل / Modèle</label>
+          <input type="text" name="model" class="form-control" value="{{ p.model|default:'' }}">
+        </div>
+        <div class="col-12">
+          <label class="form-label">الوصف</label>
+          <textarea name="description" class="form-control" rows="2">{{ p.description|default:'' }}</textarea>
+        </div>
+        <div class="col-12">
+          <label class="form-label">المواصفات التقنية</label>
+          <textarea name="specifications" class="form-control" rows="2">{{ p.specifications|default:'' }}</textarea>
+        </div>
+        {% if action == "edit" %}
+        <div class="col-12">
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" name="active" id="active" {% if p.active %}checked{% endif %}>
+            <label class="form-check-label" for="active">منتج نشط</label>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+      <div class="mt-4 d-flex gap-2">
+        <button type="submit" class="btn btn-primary px-4"><i class="bi bi-check-lg"></i> حفظ</button>
+        <a href="{% url 'catalog:products' %}" class="btn btn-outline-secondary">إلغاء</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

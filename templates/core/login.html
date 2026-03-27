@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block auth_content %}
+<div class="min-vh-100 d-flex align-items-center justify-content-center" style="background:linear-gradient(135deg,#0f0c29,#1a1a2e,#16213e)">
+<div style="width:420px">
+<div class="card shadow-lg border-0 overflow-hidden">
+  <div class="text-center p-4" style="background:linear-gradient(135deg,#1a1a2e,#0f3460);color:white">
+    <div style="font-size:3rem">🏛️</div>
+    <h4 class="fw-bold mt-2 mb-1">نظام الوسائل العامة</h4>
+    <small class="opacity-75">{{ FACULTY_NAME }}<br>{{ UNIVERSITY_NAME }}</small>
+  </div>
+  <div class="card-body p-4">
+    {% if messages %}{% for m in messages %}<div class="alert alert-danger py-2">{{ m }}</div>{% endfor %}{% endif %}
+    <form method="post">{% csrf_token %}
+      <div class="mb-3">
+        <label class="form-label"><i class="bi bi-person"></i> اسم المستخدم</label>
+        <input type="text" name="username" class="form-control form-control-lg" autofocus required>
+      </div>
+      <div class="mb-4">
+        <label class="form-label"><i class="bi bi-lock"></i> كلمة المرور</label>
+        <input type="password" name="password" class="form-control form-control-lg" required>
+      </div>
+      <button type="submit" class="btn btn-primary btn-lg w-100 fw-bold">
+        <i class="bi bi-box-arrow-in-right"></i> دخول
+      </button>
+    </form>
+  </div>
+</div>
+</div>
+</div>
+{% endblock %}

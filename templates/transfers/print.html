@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head><meta charset="UTF-8"><title>سند التحويل {{ t.number }}</title>
+<style>
+*{font-family:Tahoma,Arial,sans-serif;box-sizing:border-box;margin:0;padding:0;}
+body{font-size:11px;color:#111;background:white;direction:rtl;}
+@page{size:A4;margin:15mm;}
+.header{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px double #1a1a2e;padding-bottom:10px;margin-bottom:10px;}
+.hc{text-align:center;flex:1;line-height:1.8;}
+.title{text-align:center;margin:10px 0 12px;}
+.title h1{font-size:17px;font-weight:900;border:2px solid #1a1a2e;display:inline-block;padding:5px 30px;border-radius:3px;}
+.meta{width:100%;border-collapse:collapse;margin-bottom:12px;}
+.meta td{padding:5px 8px;border:1px solid #ccc;}
+.meta .lbl{background:#f0f4ff;font-weight:700;width:20%;}
+.items{width:100%;border-collapse:collapse;margin-bottom:12px;}
+.items th{background:#1a1a2e;color:white;padding:6px;text-align:center;border:1px solid #1a1a2e;}
+.items td{padding:6px;border:1px solid #ccc;height:24px;}
+.sig-wrap{border:1px solid #ccc;border-radius:4px;overflow:hidden;}
+.sig-hd{background:#1a1a2e;color:white;text-align:center;padding:5px;font-weight:700;}
+.sig-body{display:flex;}
+.sig-box{flex:1;padding:12px;border-left:1px solid #ddd;text-align:center;}
+.sig-box:last-child{border-left:none;}
+.sig-role{font-weight:800;font-size:10.5px;color:#1a1a2e;}
+.sig-line{border-top:1px solid #888;width:80%;margin:20px auto 4px;}
+.no-print{margin:16px auto;display:block;padding:9px 30px;background:#1a1a2e;color:white;border:none;border-radius:6px;font-size:13px;cursor:pointer;}
+@media print{.no-print{display:none!important;}}
+</style></head>
+<body>
+<button class="no-print" onclick="window.print()">🖨️ طباعة السند</button>
+<div class="header">
+  <div style="width:70px;height:70px;border:2px dashed #ccc;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;color:#aaa;text-align:center">شعار<br>الكلية</div>
+  <div class="hc">الجمهورية الجزائرية الديمقراطية الشعبية<br>وزارة التعليم العالي والبحث العلمي<br><strong>{{ UNIVERSITY_NAME }}</strong><br><strong>{{ FACULTY_NAME }}</strong></div>
+  <div style="width:70px"></div>
+</div>
+<div class="title"><h1>سند التحويل</h1><p style="font-size:9px;color:#666;margin-top:3px;letter-spacing:2px">BON DE TRANSFERT DE MATÉRIELS</p></div>
+<table class="meta">
+  <tr><td class="lbl">رقم السند</td><td><strong>{{ t.number }}</strong></td><td class="lbl">التاريخ</td><td>{{ t.created_at|date:"Y-m-d" }}</td></tr>
+  <tr><td class="lbl">المصلحة الطالبة</td><td>{{ t.requesting_dept }}</td><td class="lbl">الحالة</td><td><strong>{{ t.get_status_display }}</strong></td></tr>
+  <tr><td class="lbl">طُلب بواسطة</td><td>{{ t.requested_by.get_full_name }}</td><td class="lbl">ملاحظات</td><td>{{ t.notes }}</td></tr>
+</table>
+<table class="items">
+  <thead><tr><th style="width:5%">#</th><th style="width:12%">الرمز</th><th style="width:38%;text-align:right">المادة</th><th style="width:12%">الوحدة</th><th style="width:14%">المطلوب</th><th style="width:14%">المسلَّم</th></tr></thead>
+  <tbody>
+  {% for item in items %}<tr>
+    <td style="text-align:center">{{ forloop.counter }}</td>
+    <td>{{ item.product.code }}</td>
+    <td style="text-align:right">{{ item.product.name }}</td>
+    <td style="text-align:center">{{ item.product.unit.symbol }}</td>
+    <td style="text-align:center">{{ item.requested_qty }}</td>
+    <td style="text-align:center;font-weight:700">{{ item.delivered_qty|default:"" }}</td>
+  </tr>{% endfor %}
+  {% for i in "12345678" %}{% if forloop.counter > items|length %}<tr><td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td></tr>{% endif %}{% endfor %}
+  </tbody>
+</table>
+<div class="sig-wrap">
+  <div class="sig-hd">التوقيعات — Signatures</div>
+  <div class="sig-body">
+    <div class="sig-box"><div class="sig-role">مسؤول مصلحة الوسائل</div><div style="font-size:10px;color:#555;margin:3px 0">{{ t.approved_by.get_full_name|default:"" }}</div><div class="sig-line"></div><div style="font-size:9px;color:#888">{{ t.approved_at|date:"Y-m-d"|default:"........................." }}</div></div>
+    <div class="sig-box"><div class="sig-role">أمين المخزن</div><div style="font-size:10px;color:#555;margin:3px 0">{{ t.executed_by.get_full_name|default:"" }}</div><div class="sig-line"></div><div style="font-size:9px;color:#888">{{ t.executed_at|date:"Y-m-d"|default:"........................." }}</div></div>
+    <div class="sig-box"><div class="sig-role" style="color:#e94560">رئيس {{ t.requesting_dept }}</div><div style="font-size:10px;font-weight:800;color:#1a1a2e;margin:3px 0">{{ t.received_by.get_full_name|default:"........................................." }}</div><div class="sig-line"></div><div style="font-size:9px;color:#888">{{ t.received_at|date:"Y-m-d"|default:"........................." }}</div></div>
+  </div>
+</div>
+<button class="no-print" onclick="window.print()">🖨️ طباعة السند</button>
+</body></html>

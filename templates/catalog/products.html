@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}كتالوج المنتجات{% endblock %}
+{% block content %}
+<div class="page-header">
+  <span class="ph-icon">📦</span>
+  <div><h1>كتالوج المنتجات والمواد</h1><p>إدارة جميع المواد والمنتجات</p></div>
+  <div class="ph-actions">
+    <a href="{% url 'catalog:product_add' %}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> منتج جديد</a>
+    <a href="{% url 'catalog:categories' %}" class="btn btn-outline-secondary ms-2"><i class="bi bi-tags"></i> الفئات</a>
+    <a href="{% url 'catalog:units' %}" class="btn btn-outline-secondary ms-2"><i class="bi bi-rulers"></i> الوحدات</a>
+  </div>
+</div>
+<div class="card mb-3">
+  <div class="card-body py-2">
+    <form method="get" class="row g-2 align-items-end">
+      <div class="col-md-5"><input type="text" name="q" value="{{ search }}" class="form-control" placeholder="🔍 بحث باسم المنتج أو الرمز..."></div>
+      <div class="col-md-4">
+        <select name="cat" class="form-select">
+          <option value="">كل الفئات</option>
+          {% for c in cats %}<option value="{{ c.pk }}" {% if cat_id == c.pk|stringformat:"s" %}selected{% endif %}>{{ c.icon }} {{ c.name }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="col-md-3"><button type="submit" class="btn btn-primary w-100"><i class="bi bi-search"></i> بحث</button></div>
+    </form>
+  </div>
+</div>
+<div class="card">
+  <div class="card-header"><i class="bi bi-box-seam"></i> قائمة المنتجات <span class="badge bg-secondary ms-2">{{ prods|length }}</span></div>
+  <div class="card-body p-0">
+    <table class="table table-custom table-hover mb-0">
+      <thead><tr><th>الرمز</th><th>الاسم</th><th>الفئة</th><th>الوحدة</th><th>الكمية</th><th>الحد الأدنى</th><th>الحالة</th><th>إجراءات</th></tr></thead>
+      <tbody>
+      {% for item in prods %}
+      <tr>
+        <td><code>{{ item.obj.code }}</code></td>
+        <td><strong>{{ item.obj.name }}</strong>{% if item.obj.brand %}<br><small class="text-muted">{{ item.obj.brand }}</small>{% endif %}</td>
+        <td>{{ item.obj.category.icon }} {{ item.obj.category.name }}</td>
+        <td>{{ item.obj.unit.name }}</td>
+        <td><strong>{{ item.qty }}</strong></td>
+        <td>{{ item.obj.min_stock }}</td>
+        <td><span class="badge bg-{{ item.color }}">{{ item.status }}</span></td>
+        <td><a href="{% url 'catalog:product_edit' item.obj.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a></td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="8" class="text-center py-4 text-muted">لا توجد منتجات — <a href="{% url 'catalog:product_add' %}">أضف أول منتج</a></td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}حركات المخزن{% endblock %}
+{% block content %}
+<div class="page-header">
+  <span class="ph-icon">🔄</span>
+  <div><h1>سجل حركات المخزن</h1></div>
+  <div class="ph-actions"><a href="{% url 'purchasing:receive' %}" class="btn btn-primary"><i class="bi bi-truck"></i> استلام بضاعة</a></div>
+</div>
+<div class="card mb-3"><div class="card-body py-2">
+  <form method="get" class="row g-2">
+    <div class="col-md-5"><input type="text" name="q" value="{{ q }}" class="form-control" placeholder="🔍 بحث بالمادة أو المرجع..."></div>
+    <div class="col-md-3"><select name="dir" class="form-select"><option value="">كل الحركات</option><option value="in" {% if d == "in" %}selected{% endif %}>📥 دخول فقط</option><option value="out" {% if d == "out" %}selected{% endif %}>📤 خروج فقط</option></select></div>
+    <div class="col-md-4"><button type="submit" class="btn btn-primary w-100">بحث</button></div>
+  </form>
+</div></div>
+<div class="card"><div class="card-body p-0">
+  <table class="table table-custom table-hover mb-0">
+    <thead><tr><th>التاريخ</th><th>النوع</th><th>المادة</th><th>الكمية</th><th>من / إلى</th><th>المرجع</th></tr></thead>
+    <tbody>
+    {% for m in movements %}
+    <tr>
+      <td><small>{{ m.date|date:"Y-m-d H:i" }}</small></td>
+      <td>{% if m.direction == "in" %}<span class="badge bg-success">📥 دخول</span>{% else %}<span class="badge bg-danger">📤 خروج</span>{% endif %}</td>
+      <td><strong>{{ m.product.name }}</strong></td>
+      <td><strong>{{ m.quantity }}</strong> {{ m.product.unit.symbol }}</td>
+      <td><small class="text-muted">{% if m.direction == "in" %}{{ m.from_location }}{% else %}{{ m.to_location }}{% endif %}</small></td>
+      <td><small><code>{{ m.reference_number }}</code></small></td>
+    </tr>
+    {% empty %}<tr><td colspan="6" class="text-center py-4 text-muted">لا توجد حركات</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div></div>
+{% endblock %}

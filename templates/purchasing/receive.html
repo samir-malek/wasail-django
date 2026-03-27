@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}استلام بضاعة{% endblock %}
+{% block content %}
+<div class="page-header"><span class="ph-icon">📥</span><div><h1>استلام بضاعة من مورد</h1></div>
+  <div class="ph-actions"><a href="{% url 'purchasing:po_new' %}" class="btn btn-outline-primary"><i class="bi bi-file-earmark-plus"></i> طلب شراء جديد</a></div>
+</div>
+<div class="card"><div class="card-body p-4">
+  <form method="post" id="receiveForm">{% csrf_token %}
+    <div class="row g-3 mb-4">
+      <div class="col-md-4"><label class="form-label">المورد ★</label>
+        <select name="supplier" class="form-select" required>
+          <option value="">-- اختر المورد --</option>
+          {% for s in suppliers %}<option value="{{ s.pk }}">{{ s.code }} — {{ s.name }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="col-md-4"><label class="form-label">رقم الفاتورة ★</label><input type="text" name="invoice_number" class="form-control" required placeholder="FAC-2024-001"></div>
+      <div class="col-md-4"><label class="form-label">تاريخ الاستلام</label><input type="date" name="date" class="form-control" value="{% now 'Y-m-d' %}"></div>
+      <div class="col-12"><label class="form-label">ملاحظات</label><textarea name="notes" class="form-control" rows="2"></textarea></div>
+    </div>
+    <h6 class="fw-bold mb-3 border-bottom pb-2"><i class="bi bi-box-seam"></i> المواد المستلمة</h6>
+    {% for p in products %}
+    <div class="row g-2 mb-2 align-items-center">
+      <div class="col-md-5"><div class="d-flex align-items-center gap-2"><code class="badge bg-secondary">{{ p.code }}</code><span>{{ p.name }}</span><small class="text-muted">({{ p.unit.symbol }})</small></div></div>
+      <div class="col-md-3"><input type="number" name="qty" class="form-control form-control-sm" min="0" step="0.01" value="0" placeholder="الكمية"><input type="hidden" name="product_id" value="{{ p.pk }}"></div>
+      <div class="col-md-4"><div class="input-group input-group-sm"><input type="number" name="price" class="form-control" min="0" step="0.01" value="0" placeholder="سعر الوحدة"><span class="input-group-text">دج</span></div></div>
+    </div>
+    {% endfor %}
+    <div class="mt-4 d-flex gap-2"><button type="submit" class="btn btn-primary px-4"><i class="bi bi-check-lg"></i> تسجيل الاستلام</button><a href="{% url 'stock:list' %}" class="btn btn-outline-secondary">إلغاء</a></div>
+  </form>
+</div></div>
+{% endblock %}

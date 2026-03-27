@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}الموردون{% endblock %}
+{% block content %}
+<div class="page-header">
+  <span class="ph-icon">🏭</span>
+  <div><h1>إدارة الموردين</h1><p>{{ suppliers|length }} مورد مسجل</p></div>
+  <div class="ph-actions"><a href="{% url 'suppliers:add' %}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> مورد جديد</a></div>
+</div>
+<div class="card mb-3"><div class="card-body py-2">
+  <form method="get" class="row g-2">
+    <div class="col-md-8"><input type="text" name="q" value="{{ q }}" class="form-control" placeholder="🔍 بحث باسم أو رمز أو هاتف..."></div>
+    <div class="col-md-4"><button type="submit" class="btn btn-primary w-100">بحث</button></div>
+  </form>
+</div></div>
+<div class="card"><div class="card-body p-0">
+  <table class="table table-custom table-hover mb-0">
+    <thead><tr><th>الرمز</th><th>الاسم</th><th>النوع</th><th>الولاية</th><th>الهاتف</th><th>التقييم</th><th>إجراءات</th></tr></thead>
+    <tbody>
+    {% for s in suppliers %}
+    <tr>
+      <td><code>{{ s.code }}</code></td>
+      <td><a href="{% url 'suppliers:detail' s.pk %}" class="fw-bold text-decoration-none">{{ s.name }}</a><br><small class="text-muted">{{ s.name_fr }}</small></td>
+      <td>{{ s.get_supplier_type_display }}</td>
+      <td>{{ s.wilaya }}</td>
+      <td>{{ s.phone }}</td>
+      <td>{{ s.rating_stars }}</td>
+      <td><a href="{% url 'suppliers:detail' s.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-eye"></i></a></td>
+    </tr>
+    {% empty %}<tr><td colspan="7" class="text-center py-4 text-muted">لا يوجد موردون — <a href="{% url 'suppliers:add' %}">أضف أول مورد</a></td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div></div>
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}الفئات{% endblock %}
+{% block content %}
+<div class="page-header">
+  <span class="ph-icon">🏷️</span>
+  <div><h1>فئات المنتجات</h1></div>
+</div>
+<div class="row g-3">
+  <div class="col-md-4">
+    <div class="card"><div class="card-header"><i class="bi bi-plus-circle"></i> إضافة فئة جديدة</div>
+    <div class="card-body">
+      <form method="post">{% csrf_token %}
+        <div class="mb-3"><label class="form-label">الاسم (عربي) ★</label><input type="text" name="name" class="form-control" required></div>
+        <div class="mb-3"><label class="form-label">Nom (Français)</label><input type="text" name="name_fr" class="form-control"></div>
+        <div class="mb-3"><label class="form-label">أيقونة Emoji</label><input type="text" name="icon" class="form-control" value="📦" maxlength="4"></div>
+        <div class="mb-3"><label class="form-label">وصف</label><textarea name="description" class="form-control" rows="2"></textarea></div>
+        <button type="submit" class="btn btn-primary w-100">✅ إضافة</button>
+      </form>
+    </div></div>
+  </div>
+  <div class="col-md-8">
+    <div class="card"><div class="card-header"><i class="bi bi-grid"></i> الفئات الحالية</div>
+    <div class="card-body p-0">
+      <table class="table table-custom mb-0">
+        <thead><tr><th></th><th>الفئة</th><th>بالفرنسية</th><th>عدد المنتجات</th></tr></thead>
+        <tbody>
+        {% for c in cats %}
+        <tr><td style="width:40px;font-size:1.3rem">{{ c.icon }}</td>
+          <td><strong>{{ c.name }}</strong></td><td>{{ c.name_fr }}</td>
+          <td><span class="badge bg-primary">{{ c.cnt }}</span></td>
+        </tr>
+        {% empty %}<tr><td colspan="4" class="text-center text-muted py-3">لا توجد فئات</td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </div></div>
+  </div>
+</div>
+{% endblock %}

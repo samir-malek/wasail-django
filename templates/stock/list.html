@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}المخزون{% endblock %}
+{% block content %}
+<div class="page-header">
+  <span class="ph-icon">📊</span>
+  <div><h1>حالة المخزون</h1></div>
+  <div class="ph-actions">
+    <a href="?f=zero" class="btn btn-outline-danger btn-sm">🔴 نفد</a>
+    <a href="?f=low" class="btn btn-outline-warning btn-sm ms-1">🟠 منخفض</a>
+    <a href="?" class="btn btn-outline-secondary btn-sm ms-1">الكل</a>
+  </div>
+</div>
+<div class="row g-3 mb-3">
+  <div class="col-6 col-md-3"><div class="card text-center p-3" style="border-top:3px solid #10b981"><div style="font-size:1.8rem;font-weight:900;color:#10b981">{{ items|length }}</div><small class="text-muted">إجمالي المنتجات</small></div></div>
+  <div class="col-6 col-md-3"><div class="card text-center p-3" style="border-top:3px solid #ef4444"><div style="font-size:1.8rem;font-weight:900;color:#ef4444">{{ out_of }}</div><small class="text-muted">🔴 نفد المخزون</small></div></div>
+  <div class="col-6 col-md-3"><div class="card text-center p-3" style="border-top:3px solid #f59e0b"><div style="font-size:1.8rem;font-weight:900;color:#f59e0b">{{ low }}</div><small class="text-muted">🟠 منخفض</small></div></div>
+  <div class="col-6 col-md-3"><div class="card text-center p-3" style="border-top:3px solid #3b82f6"><a href="{% url 'purchasing:receive' %}" class="btn btn-primary w-100 h-100 d-flex align-items-center justify-content-center"><i class="bi bi-truck"></i>&nbsp; استلام بضاعة</a></div></div>
+</div>
+<div class="card"><div class="card-body p-0">
+  <table class="table table-custom table-hover mb-0">
+    <thead><tr><th>الرمز</th><th>المنتج</th><th>الفئة</th><th>الكمية المتاحة</th><th>الوحدة</th><th>الحد الأدنى</th><th>الحالة</th></tr></thead>
+    <tbody>
+    {% for item in items %}
+    <tr>
+      <td><code>{{ item.s.product.code }}</code></td>
+      <td><strong>{{ item.s.product.name }}</strong>{% if item.s.product.brand %}<br><small class="text-muted">{{ item.s.product.brand }}</small>{% endif %}</td>
+      <td>{{ item.s.product.category.icon }} {{ item.s.product.category.name }}</td>
+      <td><span class="fw-bold fs-6 text-{{ item.color }}">{{ item.s.quantity }}</span></td>
+      <td>{{ item.s.product.unit.symbol }}</td>
+      <td>{{ item.s.product.min_stock }}</td>
+      <td><span class="badge bg-{{ item.color }}">{{ item.status }}</span></td>
+    </tr>
+    {% empty %}<tr><td colspan="7" class="text-center py-4 text-muted">لا توجد بيانات مخزون</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div></div>
+{% endblock %}

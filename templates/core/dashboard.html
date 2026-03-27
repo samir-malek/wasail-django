@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}لوحة التحكم{% endblock %}
+{% block content %}
+<div class="page-header">
+  <span class="ph-icon">🏠</span>
+  <div><h1>لوحة التحكم</h1><p>{{ FACULTY_NAME }}</p></div>
+</div>
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-3">
+    <div class="stat-card" style="background:linear-gradient(135deg,#667eea,#764ba2)">
+      <div class="stat-val">{{ total_products }}</div><div class="stat-lbl">📦 المنتجات</div>
+      <i class="bi bi-box-seam stat-icon"></i></div></div>
+  <div class="col-6 col-md-3">
+    <div class="stat-card" style="background:linear-gradient(135deg,#f093fb,#f5576c)">
+      <div class="stat-val">{{ total_suppliers }}</div><div class="stat-lbl">🏭 الموردون</div>
+      <i class="bi bi-building stat-icon"></i></div></div>
+  <div class="col-6 col-md-3">
+    <div class="stat-card" style="background:linear-gradient(135deg,#43e97b,#38f9d7)">
+      <div class="stat-val">{{ total_offices }}</div><div class="stat-lbl">🏢 المكاتب</div>
+      <i class="bi bi-door-open stat-icon"></i></div></div>
+  <div class="col-6 col-md-3">
+    <div class="stat-card" style="background:linear-gradient(135deg,#f59e0b,#d97706)">
+      <div class="stat-val">{{ pending_transfers }}</div><div class="stat-lbl">⏳ طلبات معلقة</div>
+      <i class="bi bi-clock stat-icon"></i></div></div>
+</div>
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-3"><div class="card text-center p-3" style="border-top:3px solid #ef4444">
+    <div style="font-size:1.8rem;font-weight:900;color:#ef4444">{{ out_of_stock }}</div>
+    <small class="text-muted">🔴 نفد المخزون</small></div></div>
+  <div class="col-6 col-md-3"><div class="card text-center p-3" style="border-top:3px solid #3b82f6">
+    <div style="font-size:1.8rem;font-weight:900;color:#3b82f6">{{ approved_transfers }}</div>
+    <small class="text-muted">✅ جاهز للتنفيذ</small></div></div>
+  <div class="col-6 col-md-3"><div class="card text-center p-3" style="border-top:3px solid #8b5cf6">
+    <div style="font-size:1.8rem;font-weight:900;color:#8b5cf6">{{ pending_po }}</div>
+    <small class="text-muted">📋 طلبات شراء</small></div></div>
+  <div class="col-6 col-md-3"><div class="card text-center p-3" style="border-top:3px solid #10b981">
+    <div style="font-size:1.8rem;font-weight:900;color:#10b981">{{ week_in }}</div>
+    <small class="text-muted">📥 دخول الأسبوع</small></div></div>
+</div>
+<div class="row g-3">
+  <div class="col-md-6">
+    <div class="card"><div class="card-header"><i class="bi bi-exclamation-triangle text-warning"></i> تنبيهات المخزون</div>
+    <div class="card-body p-0">
+    {% if low_stock %}<table class="table table-custom mb-0">
+      <thead><tr><th>المادة</th><th>الكمية</th><th>الحد</th><th>الحالة</th></tr></thead>
+      <tbody>{% for s in low_stock %}<tr>
+        <td>{{ s.product.name }}</td>
+        <td><strong>{{ s.quantity }}</strong> {{ s.product.unit.symbol }}</td>
+        <td>{{ s.product.min_stock }}</td>
+        <td>{% if s.quantity == 0 %}<span class="badge bg-danger">نفد</span>{% else %}<span class="badge bg-warning text-dark">منخفض</span>{% endif %}</td>
+      </tr>{% endfor %}</tbody></table>
+    {% else %}<div class="text-center py-4 text-success"><i class="bi bi-check-circle fs-3"></i><p class="mt-2 mb-0">المخزون بحالة جيدة</p></div>{% endif %}
+    </div></div></div>
+  <div class="col-md-6">
+    <div class="card"><div class="card-header"><i class="bi bi-file-earmark-text"></i> آخر السندات
+      <a href="{% url 'transfers:list' %}" class="btn btn-sm btn-outline-secondary card-actions">الكل</a></div>
+    <div class="card-body p-0"><table class="table table-custom mb-0">
+      <thead><tr><th>السند</th><th>المصلحة</th><th>الحالة</th></tr></thead>
+      <tbody>{% for t in last_transfers %}<tr>
+        <td><a href="{% url 'transfers:detail' t.pk %}" class="fw-bold text-decoration-none">{{ t.number }}</a></td>
+        <td>{{ t.requesting_dept }}</td>
+        <td><span class="badge bg-{{ t.status_badge }}">{{ t.get_status_display }}</span></td>
+      </tr>{% empty %}<tr><td colspan="3" class="text-center text-muted py-3">لا توجد سندات</td></tr>{% endfor %}
+      </tbody></table></div></div></div>
+  <div class="col-12">
+    <div class="card"><div class="card-header"><i class="bi bi-arrow-left-right"></i> آخر الحركات
+      <a href="{% url 'stock:movements' %}" class="btn btn-sm btn-outline-secondary card-actions">الكل</a></div>
+    <div class="card-body p-0"><table class="table table-custom mb-0">
+      <thead><tr><th>التاريخ</th><th>النوع</th><th>المادة</th><th>الكمية</th><th>المرجع</th></tr></thead>
+      <tbody>{% for m in last_movements %}<tr>
+        <td><small>{{ m.date|date:"Y-m-d H:i" }}</small></td>
+        <td>{% if m.direction == "in" %}<span class="badge bg-success">📥 دخول</span>{% else %}<span class="badge bg-danger">📤 خروج</span>{% endif %}</td>
+        <td>{{ m.product.name }}</td>
+        <td><strong>{{ m.quantity }}</strong> {{ m.product.unit.symbol }}</td>
+        <td><small class="text-muted">{{ m.reference_number }}</small></td>
+      </tr>{% empty %}<tr><td colspan="5" class="text-center text-muted py-3">لا توجد حركات</td></tr>{% endfor %}
+      </tbody></table></div></div></div>
+</div>
+{% endblock %}

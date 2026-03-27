@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}إضافة مكتب{% endblock %}
+{% block content %}
+<div class="page-header"><span class="ph-icon">🏢</span><div><h1>إضافة مكتب / محل / قاعة</h1></div></div>
+<div class="card" style="max-width:800px"><div class="card-body p-4">
+  <form method="post">{% csrf_token %}
+    <div class="row g-3">
+      <div class="col-md-3"><label class="form-label">الرمز ★</label><input type="text" name="code" class="form-control" required placeholder="OFF-010"></div>
+      <div class="col-md-5"><label class="form-label">الاسم (عربي) ★</label><input type="text" name="name" class="form-control" required></div>
+      <div class="col-md-4"><label class="form-label">Nom (Français)</label><input type="text" name="name_fr" class="form-control"></div>
+      <div class="col-md-4"><label class="form-label">النوع ★</label>
+        <select name="office_type" class="form-select">
+          {% for val,lbl in office_types %}<option value="{{ val }}">{{ lbl }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="col-md-4"><label class="form-label">الطابق</label>
+        <select name="floor" class="form-select">
+          <option value="الطابق الأرضي">الطابق الأرضي</option>
+          <option value="الطابق الأول">الطابق الأول</option>
+          <option value="الطابق الثاني">الطابق الثاني</option>
+          <option value="الطابق الثالث">الطابق الثالث</option>
+        </select>
+      </div>
+      <div class="col-md-4"><label class="form-label">المبنى / الجناح</label><input type="text" name="building" class="form-control" placeholder="A, B..."></div>
+      <div class="col-md-3"><label class="form-label">المساحة (م²)</label><input type="number" name="surface" class="form-control" min="0" step="0.01"></div>
+      <div class="col-md-3"><label class="form-label">الطاقة الاستيعابية</label><input type="number" name="capacity" class="form-control" min="0"></div>
+      <div class="col-md-3"><label class="form-label">الهاتف</label><input type="text" name="phone" class="form-control"></div>
+      <div class="col-md-3"><label class="form-label">البريد</label><input type="email" name="email" class="form-control"></div>
+      <div class="col-md-6"><label class="form-label">المصلحة المرتبطة</label>
+        <select name="department" class="form-select">
+          {% for d in departments %}<option value="{{ d }}">{{ d }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="col-12"><label class="form-label">ملاحظات</label><textarea name="notes" class="form-control" rows="2"></textarea></div>
+    </div>
+    <div class="mt-4 d-flex gap-2"><button type="submit" class="btn btn-primary px-4">✅ إضافة</button><a href="{% url 'offices:list' %}" class="btn btn-outline-secondary">إلغاء</a></div>
+  </form>
+</div></div>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}{{ s.name }}{% endblock %}
+{% block content %}
+<div class="page-header">
+  <span class="ph-icon">🏭</span>
+  <div><h1>{{ s.name }}</h1><p>{{ s.code }} | {{ s.rating_stars }}</p></div>
+  <div class="ph-actions"><a href="{% url 'suppliers:edit' s.pk %}" class="btn btn-primary"><i class="bi bi-pencil"></i> تعديل</a></div>
+</div>
+<div class="row g-3">
+  <div class="col-md-6">
+    <div class="card h-100"><div class="card-header"><i class="bi bi-info-circle"></i> المعلومات الأساسية</div>
+    <div class="card-body">
+      <table class="table table-sm table-borderless mb-0">
+        <tr><th width="40%">الاسم بالفرنسية</th><td>{{ s.name_fr|default:"—" }}</td></tr>
+        <tr><th>النوع</th><td>{{ s.get_supplier_type_display }}</td></tr>
+        <tr><th>الهاتف</th><td>{{ s.phone }} {% if s.phone2 %}/ {{ s.phone2 }}{% endif %}</td></tr>
+        <tr><th>البريد</th><td>{{ s.email|default:"—" }}</td></tr>
+        <tr><th>الولاية</th><td>{{ s.wilaya|default:"—" }}</td></tr>
+        <tr><th>العنوان</th><td>{{ s.address|default:"—" }}</td></tr>
+        <tr><th>شروط الدفع</th><td>{{ s.get_payment_terms_display }}</td></tr>
+        <tr><th>مدة التسليم</th><td>{{ s.delivery_days }} يوم</td></tr>
+        <tr><th>التقييم</th><td>{{ s.rating_stars }}</td></tr>
+      </table>
+    </div></div>
+  </div>
+  <div class="col-md-6">
+    <div class="card h-100"><div class="card-header"><i class="bi bi-bank"></i> المعلومات القانونية</div>
+    <div class="card-body">
+      <table class="table table-sm table-borderless mb-0">
+        <tr><th width="40%">NIF</th><td>{{ s.nif|default:"—" }}</td></tr>
+        <tr><th>NIS</th><td>{{ s.nis|default:"—" }}</td></tr>
+        <tr><th>RC</th><td>{{ s.rc|default:"—" }}</td></tr>
+        <tr><th>البنك</th><td>{{ s.bank_name|default:"—" }}</td></tr>
+        <tr><th>رقم الحساب</th><td>{{ s.bank_account|default:"—" }}</td></tr>
+      </table>
+    </div></div>
+  </div>
+  <div class="col-12">
+    <div class="card"><div class="card-header"><i class="bi bi-person-lines-fill"></i> جهات الاتصال</div>
+    <div class="card-body">
+      <form method="post" class="row g-2 mb-3 pb-3 border-bottom">{% csrf_token %}
+        <div class="col-md-3"><input type="text" name="full_name" class="form-control" placeholder="الاسم الكامل ★" required></div>
+        <div class="col-md-3"><input type="text" name="position" class="form-control" placeholder="المنصب"></div>
+        <div class="col-md-2"><input type="text" name="phone" class="form-control" placeholder="الهاتف"></div>
+        <div class="col-md-2"><input type="email" name="email" class="form-control" placeholder="البريد"></div>
+        <div class="col-md-2"><button type="submit" class="btn btn-success w-100">➕ إضافة</button></div>
+      </form>
+      <table class="table table-custom mb-0">
+        <thead><tr><th>الاسم</th><th>المنصب</th><th>الهاتف</th><th>البريد</th></tr></thead>
+        <tbody>{% for c in contacts %}<tr><td>{{ c.full_name }}</td><td>{{ c.position }}</td><td>{{ c.phone }}</td><td>{{ c.email }}</td></tr>
+        {% empty %}<tr><td colspan="4" class="text-center text-muted">لا توجد جهات اتصال</td></tr>{% endfor %}</tbody>
+      </table>
+    </div></div>
+  </div>
+</div>
+{% endblock %}

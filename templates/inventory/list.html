@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}الجرد الدوري{% endblock %}
+{% block content %}
+<div class="page-header"><span class="ph-icon">🗂️</span><div><h1>الجرد الدوري للمخزن</h1></div>
+  <div class="ph-actions"><a href="{% url 'inventory:new' %}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> جلسة جرد جديدة</a></div>
+</div>
+<div class="card"><div class="card-body p-0">
+  <table class="table table-custom table-hover mb-0">
+    <thead><tr><th>رقم الجرد</th><th>التاريخ</th><th>النطاق</th><th>أجراه</th><th>المنتجات</th><th>إجراءات</th></tr></thead>
+    <tbody>
+    {% for s in sessions %}
+    <tr>
+      <td><a href="{% url 'inventory:detail' s.pk %}" class="fw-bold text-decoration-none">{{ s.number }}</a></td>
+      <td>{{ s.date|date:"Y-m-d H:i" }}</td>
+      <td>{{ s.scope }}</td>
+      <td>{{ s.conducted_by.get_full_name }}</td>
+      <td><span class="badge bg-secondary">{{ s.items.count }}</span></td>
+      <td><a href="{% url 'inventory:detail' s.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-eye"></i></a></td>
+    </tr>
+    {% empty %}<tr><td colspan="6" class="text-center py-4 text-muted">لا توجد جلسات جرد — <a href="{% url 'inventory:new' %}">ابدأ أول جرد</a></td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div></div>
+{% endblock %}

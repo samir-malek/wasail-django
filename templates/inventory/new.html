@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}جلسة جرد جديدة{% endblock %}
+{% block content %}
+<div class="page-header"><span class="ph-icon">➕</span><div><h1>بدء جلسة جرد جديدة</h1></div></div>
+<div class="card"><div class="card-body p-4">
+  <div class="row g-3 mb-3">
+    <div class="col-md-4">
+      <form method="get" class="d-flex gap-2">
+        <select name="cat" class="form-select form-select-sm">
+          <option value="">كل الفئات</option>
+          {% for c in cats %}<option value="{{ c.pk }}" {% if cat_id == c.pk|stringformat:"s" %}selected{% endif %}>{{ c.icon }} {{ c.name }}</option>{% endfor %}
+        </select>
+        <button type="submit" class="btn btn-sm btn-outline-primary">تصفية</button>
+      </form>
+    </div>
+    <div class="col-md-8 text-muted"><i class="bi bi-info-circle"></i> سيشمل الجرد <strong>{{ items|length }}</strong> منتج</div>
+  </div>
+  <form method="post">{% csrf_token %}
+    <div class="row g-2 mb-3">
+      <div class="col-md-4"><input type="text" name="scope" class="form-control" placeholder="نطاق الجرد (مثال: جرد شهري شامل)" value="جرد شامل"></div>
+      <div class="col-md-4"><input type="text" name="validated_by" class="form-control" placeholder="سيُعتمد بواسطة (الاسم)"></div>
+      <div class="col-md-4"><input type="text" name="notes" class="form-control" placeholder="ملاحظات"></div>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-custom">
+        <thead><tr><th>الرمز</th><th>المنتج</th><th>الفئة</th><th>الوحدة</th><th>الكمية النظرية</th><th>الكمية الفعلية ★</th><th>الفرق</th></tr></thead>
+        <tbody>
+        {% for item in items %}
+        <tr>
+          <td><code>{{ item.p.code }}</code></td>
+          <td>{{ item.p.name }}</td>
+          <td>{{ item.p.category.name }}</td>
+          <td>{{ item.p.unit.symbol }}</td>
+          <td><strong class="text-primary">{{ item.theo }}</strong></td>
+          <td><input type="number" name="actual" class="form-control form-control-sm inv-actual" data-theo="{{ item.theo }}" value="{{ item.theo }}" min="0" step="0.01" style="width:100px"><input type="hidden" name="product_id" value="{{ item.p.pk }}"></td>
+          <td><span class="diff-display fw-bold text-muted">0</span></td>
+        </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="mt-3 d-flex gap-2"><button type="submit" class="btn btn-primary px-4"><i class="bi bi-save"></i> حفظ نتائج الجرد</button><a href="{% url 'inventory:list' %}" class="btn btn-outline-secondary">إلغاء</a></div>
+  </form>
+</div></div>
+{% endblock %}
+{% block extra_js %}
+<script>
+document.querySelectorAll('.inv-actual').forEach(function(inp) {
+  inp.addEventListener('input', function() {
+    var theo = parseFloat(this.dataset.theo) || 0;
+    var actual = parseFloat(this.value) || 0;
+    var diff = actual - theo;
+    var span = this.closest('tr').querySelector('.diff-display');
+    span.textContent = (diff >= 0 ? '+' : '') + diff.toFixed(2);
+    span.className = 'diff-display fw-bold ' + (diff === 0 ? 'text-muted' : diff > 0 ? 'text-success' : 'text-danger');
+  });
+});
+</script>
+{% endblock %}

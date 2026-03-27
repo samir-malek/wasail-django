@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}طلبات الشراء{% endblock %}
+{% block content %}
+<div class="page-header"><span class="ph-icon">📋</span><div><h1>طلبات الشراء</h1></div>
+  <div class="ph-actions"><a href="{% url 'purchasing:po_new' %}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> طلب جديد</a><a href="{% url 'purchasing:invoices' %}" class="btn btn-outline-secondary ms-2"><i class="bi bi-receipt"></i> الفواتير</a></div>
+</div>
+<div class="card"><div class="card-body p-0">
+  <table class="table table-custom table-hover mb-0">
+    <thead><tr><th>رقم الطلب</th><th>التاريخ</th><th>المورد</th><th>الأولوية</th><th>المبلغ</th><th>الحالة</th><th>إجراءات</th></tr></thead>
+    <tbody>
+    {% for po in pos %}
+    <tr>
+      <td><strong>{{ po.number }}</strong></td>
+      <td><small>{{ po.created_at|date:"Y-m-d" }}</small></td>
+      <td>{{ po.supplier.name }}</td>
+      <td>{{ po.priority }}</td>
+      <td><strong>{{ po.total_amount|floatformat:0 }}</strong> دج</td>
+      <td><span class="badge bg-{{ po.status_badge }}">{{ po.get_status_display }}</span></td>
+      <td>
+        {% if po.status == "pending" and request.user.profile.role in "admin wasail" %}
+        <form method="post" action="{% url 'purchasing:po_approve' po.pk %}" class="d-inline">{% csrf_token %}<button type="submit" class="btn btn-sm btn-success"><i class="bi bi-check-lg"></i> اعتماد</button></form>
+        {% endif %}
+      </td>
+    </tr>
+    {% empty %}<tr><td colspan="7" class="text-center py-4 text-muted">لا توجد طلبات — <a href="{% url 'purchasing:po_new' %}">أنشئ أول طلب</a></td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div></div>
+{% endblock %}

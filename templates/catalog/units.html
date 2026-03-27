@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}وحدات القياس{% endblock %}
+{% block content %}
+<div class="page-header"><span class="ph-icon">📐</span><div><h1>وحدات القياس</h1></div></div>
+<div class="row g-3">
+  <div class="col-md-4">
+    <div class="card"><div class="card-header">➕ إضافة وحدة</div><div class="card-body">
+      <form method="post">{% csrf_token %}
+        <div class="mb-3"><label class="form-label">الاسم ★</label><input type="text" name="name" class="form-control" required></div>
+        <div class="mb-3"><label class="form-label">Nom (FR)</label><input type="text" name="name_fr" class="form-control"></div>
+        <div class="mb-3"><label class="form-label">الرمز ★</label><input type="text" name="symbol" class="form-control" required maxlength="10"></div>
+        <button type="submit" class="btn btn-primary w-100">✅ إضافة</button>
+      </form>
+    </div></div>
+  </div>
+  <div class="col-md-8">
+    <div class="card"><div class="card-header">📋 الوحدات</div><div class="card-body p-0">
+      <table class="table table-custom mb-0">
+        <thead><tr><th>الاسم</th><th>بالفرنسية</th><th>الرمز</th></tr></thead>
+        <tbody>{% for u in units %}<tr><td>{{ u.name }}</td><td>{{ u.name_fr }}</td><td><code>{{ u.symbol }}</code></td></tr>
+        {% empty %}<tr><td colspan="3" class="text-center text-muted py-3">لا توجد وحدات</td></tr>{% endfor %}</tbody>
+      </table>
+    </div></div>
+  </div>
+</div>
+{% endblock %}

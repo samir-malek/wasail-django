@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}المسؤولون{% endblock %}
+{% block content %}
+<div class="page-header">
+  <span class="ph-icon">👔</span>
+  <div><h1>مسؤولو المكاتب والمصالح</h1></div>
+  <div class="ph-actions"><a href="{% url 'offices:assign_manager' %}" class="btn btn-primary"><i class="bi bi-person-plus"></i> تعيين مسؤول</a></div>
+</div>
+<div class="row g-3">
+{% for m in mgrs %}
+<div class="col-md-4">
+  <div class="card" style="border-top:3px solid #1a1a2e">
+    <div class="card-body">
+      <div class="d-flex align-items-center gap-3">
+        <div style="width:48px;height:48px;background:linear-gradient(135deg,#1a1a2e,#0f3460);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:1.3rem">👔</div>
+        <div>
+          <h6 class="fw-bold mb-0">{{ m.manager_name }}</h6>
+          <small class="text-muted">{{ m.manager_title }}</small>
+        </div>
+      </div>
+      <hr class="my-2">
+      <small><i class="bi bi-building text-primary"></i> {{ m.office.name }}</small><br>
+      {% if m.manager_phone %}<small><i class="bi bi-telephone text-success"></i> {{ m.manager_phone }}</small><br>{% endif %}
+      <small class="text-muted"><i class="bi bi-calendar"></i> منذ {{ m.start_date }}</small>
+    </div>
+  </div>
+</div>
+{% empty %}
+<div class="col-12"><div class="text-center py-5 text-muted"><i class="bi bi-people fs-1"></i><p class="mt-3">لا يوجد مسؤولون — <a href="{% url 'offices:assign_manager' %}">عيّن أول مسؤول</a></p></div></div>
+{% endfor %}
+</div>
+{% endblock %}

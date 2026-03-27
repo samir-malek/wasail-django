@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}{{ t.number }}{% endblock %}
+{% block content %}
+<div class="page-header">
+  <span class="ph-icon">📋</span>
+  <div><h1>{{ t.number }}</h1><p>{{ t.requesting_dept }} | {{ t.created_at|date:"Y-m-d H:i" }}</p></div>
+  <div class="ph-actions">
+    <span class="badge bg-{{ t.status_badge }} fs-6">{{ t.get_status_display }}</span>
+    <a href="{% url 'transfers:print' t.pk %}" target="_blank" class="btn btn-outline-secondary ms-2"><i class="bi bi-printer"></i> طباعة</a>
+  </div>
+</div>
+{% if messages %}{% for m in messages %}<div class="alert alert-{{ m.tags }} alert-dismissible"><button type="button" class="btn-close" data-bs-dismiss="alert"></button>{{ m }}</div>{% endfor %}{% endif %}
+<div class="row g-3">
+  <div class="col-md-4">
+    <div class="card"><div class="card-header"><i class="bi bi-info-circle"></i> بيانات السند</div>
+    <div class="card-body">
+      <table class="table table-sm table-borderless mb-0">
+        <tr><th>المصلحة الطالبة</th><td>{{ t.requesting_dept }}</td></tr>
+        <tr><th>طُلب بواسطة</th><td>{{ t.requested_by.get_full_name }}</td></tr>
+        <tr><th>نوع التحويل</th><td>{{ t.get_transfer_type_display }}</td></tr>
+        <tr><th>الأولوية</th><td>{{ t.get_priority_display }}</td></tr>
+        {% if t.approved_by %}<tr><th>وافق بواسطة</th><td>{{ t.approved_by.get_full_name }}<br><small class="text-muted">{{ t.approved_at|date:"Y-m-d H:i" }}</small></td></tr>{% endif %}
+        {% if t.executed_by %}<tr><th>نُفِّذ بواسطة</th><td>{{ t.executed_by.get_full_name }}<br><small class="text-muted">{{ t.executed_at|date:"Y-m-d H:i" }}</small></td></tr>{% endif %}
+        {% if t.received_by %}<tr><th>استلم بواسطة</th><td><strong class="text-success">{{ t.received_by.get_full_name }}</strong><br><small class="text-muted">{{ t.received_at|date:"Y-m-d H:i" }}</small></td></tr>{% endif %}
+        {% if t.rejection_reason %}<tr><th>سبب الرفض</th><td class="text-danger">{{ t.rejection_reason }}</td></tr>{% endif %}
+        {% if t.notes %}<tr><th>ملاحظات</th><td>{{ t.notes }}</td></tr>{% endif %}
+      </table>
+    </div></div>
+    <div class="card mt-3"><div class="card-header"><i class="bi bi-lightning"></i> الإجراءات</div>
+    <div class="card-body d-grid gap-2">
+      {% if t.status == "pending" %}
+        {% if request.user.profile.role in "admin wasail" %}
+        <form method="post" action="{% url 'transfers:approve' t.pk %}">{% csrf_token %}<button type="submit" class="btn btn-success"><i class="bi bi-check-circle"></i> موافقة</button></form>
+        <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#rejectModal"><i class="bi bi-x-circle"></i> رفض</button>
+        {% endif %}
+      {% elif t.status == "approved" %}
+        {% if request.user.profile.role in "admin wasail makhzan" %}
+        <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#executeModal"><i class="bi bi-truck"></i> تنفيذ وتسليم</button>
+        {% endif %}
+      {% elif t.status == "executed" %}
+        {% if t.requesting_dept == request.user.profile.department or request.user.profile.role in "admin wasail" %}
+        <form method="post" action="{% url 'transfers:receive' t.pk %}">{% csrf_token %}
+          <div class="alert alert-warning py-2 small mb-2"><i class="bi bi-exclamation-triangle"></i> بتأكيدك تقر باستلام المواد وتحمّل مسؤوليتها</div>
+          <button type="submit" class="btn btn-success w-100"><i class="bi bi-check2-circle"></i> تأكيد الاستلام والتوقيع</button>
+        </form>
+        {% endif %}
+      {% endif %}
+    </div></div>
+  </div>
+  <div class="col-md-8">
+    <div class="card"><div class="card-header"><i class="bi bi-list-ul"></i> المواد</div>
+    <div class="card-body p-0">
+      <table class="table table-custom mb-0">
+        <thead><tr><th>الرمز</th><th>المادة</th><th>الوحدة</th><th>المطلوب</th><th>المسلَّم</th></tr></thead>
+        <tbody>{% for item in items %}<tr>
+          <td><code>{{ item.product.code }}</code></td>
+          <td>{{ item.product.name }}</td>
+          <td>{{ item.product.unit.symbol }}</td>
+          <td><strong>{{ item.requested_qty }}</strong></td>
+          <td>{% if item.delivered_qty %}<strong class="text-success">{{ item.delivered_qty }}</strong>{% else %}<span class="text-muted">—</span>{% endif %}</td>
+        </tr>{% endfor %}</tbody>
+      </table>
+    </div></div>
+  </div>
+</div>
+
+<!-- Modal رفض -->
+<div class="modal fade" id="rejectModal" tabindex="-1">
+  <div class="modal-dialog"><div class="modal-content">
+    <div class="modal-header"><h5 class="modal-title">رفض السند</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+    <form method="post" action="{% url 'transfers:reject' t.pk %}">{% csrf_token %}
+      <div class="modal-body"><label class="form-label fw-bold">سبب الرفض ★</label><textarea name="reason" class="form-control" rows="3" required></textarea></div>
+      <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button><button type="submit" class="btn btn-danger">تأكيد الرفض</button></div>
+    </form>
+  </div></div>
+</div>
+
+<!-- Modal تنفيذ -->
+<div class="modal fade" id="executeModal" tabindex="-1">
+  <div class="modal-dialog modal-lg"><div class="modal-content">
+    <div class="modal-header"><h5 class="modal-title">تنفيذ السند — تحديد الكميات المسلَّمة</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+    <form method="post" action="{% url 'transfers:execute' t.pk %}">{% csrf_token %}
+      <div class="modal-body">
+        <table class="table table-custom">
+          <thead><tr><th>المادة</th><th>المطلوب</th><th>المتاح</th><th>يُسلَّم</th></tr></thead>
+          <tbody>{% for item in items %}<tr>
+            <td>{{ item.product.name }}</td>
+            <td>{{ item.requested_qty }}</td>
+            <td>{{ item.product.current_stock }}</td>
+            <td><input type="number" name="delivered_{{ item.pk }}" class="form-control form-control-sm" value="{{ item.requested_qty }}" min="0" max="{{ item.product.current_stock }}" step="0.01"></td>
+          </tr>{% endfor %}</tbody>
+        </table>
+      </div>
+      <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button><button type="submit" class="btn btn-warning"><i class="bi bi-truck"></i> تنفيذ وخصم المخزون</button></div>
+    </form>
+  </div></div>
+</div>
+{% endblock %}

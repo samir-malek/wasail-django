@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}سندات التحويل{% endblock %}
+{% block content %}
+<div class="page-header">
+  <span class="ph-icon">📋</span>
+  <div><h1>سندات التحويل</h1>{% if pending_count %}<p class="text-warning fw-bold">⏳ {{ pending_count }} طلب بانتظار موافقتك</p>{% endif %}</div>
+  <div class="ph-actions"><a href="{% url 'transfers:new' %}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> طلب جديد</a></div>
+</div>
+<div class="card mb-3"><div class="card-body py-2">
+  <form method="get" class="row g-2">
+    <div class="col-md-4">
+      <select name="status" class="form-select">
+        <option value="">كل الحالات</option>
+        <option value="pending" {% if status == "pending" %}selected{% endif %}>⏳ بانتظار الموافقة</option>
+        <option value="approved" {% if status == "approved" %}selected{% endif %}>✅ موافق عليه</option>
+        <option value="executed" {% if status == "executed" %}selected{% endif %}>🚚 منفَّذ</option>
+        <option value="received" {% if status == "received" %}selected{% endif %}>📬 مستلَم</option>
+        <option value="rejected" {% if status == "rejected" %}selected{% endif %}>❌ مرفوض</option>
+      </select>
+    </div>
+    <div class="col-md-3"><button type="submit" class="btn btn-primary w-100">تصفية</button></div>
+  </form>
+</div></div>
+<div class="card"><div class="card-body p-0">
+  <table class="table table-custom table-hover mb-0">
+    <thead><tr><th>رقم السند</th><th>التاريخ</th><th>المصلحة الطالبة</th><th>النوع</th><th>الأولوية</th><th>الحالة</th><th>إجراءات</th></tr></thead>
+    <tbody>
+    {% for t in transfers %}
+    <tr>
+      <td><a href="{% url 'transfers:detail' t.pk %}" class="fw-bold text-decoration-none">{{ t.number }}</a></td>
+      <td><small>{{ t.created_at|date:"Y-m-d" }}</small></td>
+      <td>{{ t.requesting_dept }}</td>
+      <td><small>{{ t.get_transfer_type_display }}</small></td>
+      <td>{% if t.priority == "critical" %}<span class="badge bg-danger">🔴 مستعجل</span>{% elif t.priority == "urgent" %}<span class="badge bg-warning text-dark">🟠 عاجل</span>{% else %}<span class="badge bg-secondary">عادي</span>{% endif %}</td>
+      <td><span class="badge bg-{{ t.status_badge }}">{{ t.get_status_display }}</span></td>
+      <td>
+        <a href="{% url 'transfers:detail' t.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-eye"></i></a>
+        {% if t.status == "pending" and request.user.profile.role in "admin wasail" %}
+        <form method="post" action="{% url 'transfers:approve' t.pk %}" class="d-inline">{% csrf_token %}<button type="submit" class="btn btn-sm btn-success ms-1"><i class="bi bi-check-lg"></i></button></form>
+        {% endif %}
+        {% if t.status == "approved" and request.user.profile.role in "admin wasail makhzan" %}
+        <a href="{% url 'transfers:detail' t.pk %}" class="btn btn-sm btn-warning ms-1"><i class="bi bi-truck"></i></a>
+        {% endif %}
+        <a href="{% url 'transfers:print' t.pk %}" target="_blank" class="btn btn-sm btn-outline-secondary ms-1"><i class="bi bi-printer"></i></a>
+      </td>
+    </tr>
+    {% empty %}<tr><td colspan="7" class="text-center py-4 text-muted">لا توجد سندات</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div></div>
+{% endblock %}

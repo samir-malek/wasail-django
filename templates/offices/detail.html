@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}{{ o.name }}{% endblock %}
+{% block content %}
+<div class="page-header">
+  <span class="ph-icon">🏢</span>
+  <div><h1>{{ o.name }}</h1><p>{{ o.code }} | {{ o.get_office_type_display }}</p></div>
+  <div class="ph-actions"><a href="{% url 'offices:assign_manager' %}?office={{ o.pk }}" class="btn btn-primary"><i class="bi bi-person-plus"></i> تعيين مسؤول</a></div>
+</div>
+<div class="row g-3">
+  <div class="col-md-5">
+    <div class="card"><div class="card-header"><i class="bi bi-info-circle"></i> بيانات المكتب</div>
+    <div class="card-body">
+      <table class="table table-sm table-borderless mb-0">
+        <tr><th>الاسم بالفرنسية</th><td>{{ o.name_fr|default:"—" }}</td></tr>
+        <tr><th>النوع</th><td>{{ o.get_office_type_display }}</td></tr>
+        <tr><th>الطابق</th><td>{{ o.floor|default:"—" }}</td></tr>
+        <tr><th>المبنى</th><td>{{ o.building|default:"—" }}</td></tr>
+        <tr><th>المساحة</th><td>{% if o.surface %}{{ o.surface }} م²{% else %}—{% endif %}</td></tr>
+        <tr><th>الطاقة الاستيعابية</th><td>{% if o.capacity %}{{ o.capacity }} شخص{% else %}—{% endif %}</td></tr>
+        <tr><th>الهاتف</th><td>{{ o.phone|default:"—" }}</td></tr>
+      </table>
+    </div></div>
+  </div>
+  <div class="col-md-7">
+    <div class="card"><div class="card-header"><i class="bi bi-person-badge"></i> سجل المسؤولين</div>
+    <div class="card-body p-0">
+      <table class="table table-custom mb-0">
+        <thead><tr><th>الاسم</th><th>الصفة</th><th>الهاتف</th><th>من</th><th>إلى</th><th>الحالة</th></tr></thead>
+        <tbody>{% for m in managers %}<tr>
+          <td><strong>{{ m.manager_name }}</strong></td>
+          <td>{{ m.manager_title }}</td>
+          <td>{{ m.manager_phone|default:"—" }}</td>
+          <td>{{ m.start_date }}</td>
+          <td>{{ m.end_date|default:"الآن" }}</td>
+          <td>{% if m.is_current %}<span class="badge bg-success">حالي</span>{% else %}<span class="badge bg-secondary">سابق</span>{% endif %}</td>
+        </tr>{% empty %}<tr><td colspan="6" class="text-center text-muted py-3">لا يوجد مسؤولون</td></tr>{% endfor %}</tbody>
+      </table>
+    </div></div>
+  </div>
+</div>
+{% endblock %}
